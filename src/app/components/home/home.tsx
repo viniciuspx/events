@@ -33,7 +33,7 @@ export const MakeHome = () => {
           <span
             className={`md:w-3/5 md:text-[30px] text-[24px] text-center inline-block align-top m-auto text-[#42A5F5] ${lemon.className}`}
           >
-            Scheduler
+            Events
             <hr />
           </span>
           <span className="text-center text-[#42A5F5] font-bold md:text-[18px] text-[14px]">

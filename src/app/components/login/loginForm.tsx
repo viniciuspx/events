@@ -37,7 +37,7 @@ export const LoginForm = () => {
       <span
         className={`md:w-2/5 md:text-[64px] text-[48px] text-center inline-block align-top m-auto text-[#42A5F5] ${lemon.className}`}
       >
-        Scheduler
+        Events
         <hr />
       </span>
       <div className="h-2/5 w-full flex flex-col mx-auto justify-center">

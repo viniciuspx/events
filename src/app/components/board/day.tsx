@@ -1,12 +1,13 @@
-import { lemon } from "@/app/fonts/fonts";
 import { FC, useEffect, useState } from "react";
-import Modal from "react-modal";
-import { postList } from "../router/postList";
-import { getEvents } from "../router/getList";
 
+import { postEvents } from "../router/postEvents";
+import { getEvents } from "../router/getEvents";
+import { deleteAllEntries } from "../router/deleteAllEntries";
+
+import { lemon } from "@/app/fonts/fonts";
+import Modal from "react-modal";
 import { BiSolidTrashAlt } from "react-icons/bi";
 import { BiCheckCircle } from "react-icons/bi";
-import { deleteList } from "../router/deleteList";
 
 interface userboard {
   id: string;
@@ -60,15 +61,14 @@ export const Board: FC<userboard> = ({ id }) => {
       desc: desc.value,
     });
     setMainEvents(newEvents);
-    console.log(newEvents, newEvents.length);
     setIsOpen(false);
   };
 
-  const handleSaveList = async (e: any) => {
+  const handleSave = async (e: any) => {
     e.preventDefault();
     if (mainEvents.length < 250) {
       try {
-        const res = await postList(id, mainEvents);
+        const res = await postEvents(id, mainEvents);
         setSaved(res);
         setTimeout(() => {
           setSaved(false);
@@ -90,8 +90,8 @@ export const Board: FC<userboard> = ({ id }) => {
     setMainEvents(tempList);
   };
 
-  const handleDeleteList = async () => {
-    await deleteList(id);
+  const handleDeleteAll = async () => {
+    await deleteAllEntries(id);
     setMainEvents([{}]);
   };
 
@@ -117,7 +117,9 @@ export const Board: FC<userboard> = ({ id }) => {
                   </button>
                 )}
                 <div className="w-1/5 font-bold">{item.date}</div>
-                <div className="w-1/5">{item.startTime + " - " + item.endTime}</div>
+                <div className="w-1/5">
+                  {item.startTime + " - " + item.endTime}
+                </div>
                 <div className={selectItem ? `w-2/5` : `w-3/5`}>
                   {item.desc}
                 </div>
@@ -135,7 +137,7 @@ export const Board: FC<userboard> = ({ id }) => {
         </button>
         <button
           className="w-4/5 md:w-1/5 max-w-[600px] text-[#24669C] font-bold border-[#42A5F5] rounded-xl border-2 hover:bg-[#42A5F5] hover:text-white m-auto"
-          onClick={handleSaveList}
+          onClick={handleSave}
         >
           Save List
         </button>
@@ -148,9 +150,9 @@ export const Board: FC<userboard> = ({ id }) => {
       <div className="flex flex-row flex-wrap">
         <button
           className="w-4/5 md:w-1/5 max-w-[600px] text-[#ff2929] font-bold border-[#ff2929] rounded-xl border-2 hover:bg-[#ff2929] hover:text-white m-auto"
-          onClick={handleDeleteList}
+          onClick={handleDeleteAll}
         >
-          Delete List
+          Delete All Entries
         </button>
       </div>
       <Modal
