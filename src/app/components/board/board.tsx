@@ -3,11 +3,14 @@ import { FC, useEffect, useState } from "react";
 import { postEvents } from "../router/postEvents";
 import { getEvents } from "../router/getEvents";
 import { deleteAllEntries } from "../router/deleteAllEntries";
+import { NewCalendar } from "../utils/calendar";
 
 import { lemon } from "@/app/fonts/fonts";
 import Modal from "react-modal";
 import { BiSolidTrashAlt } from "react-icons/bi";
 import { BiCheckCircle } from "react-icons/bi";
+import { Logout } from "../logout/logout";
+import { formatDate } from "../utils/formatedDate";
 
 interface userboard {
   id: string;
@@ -29,22 +32,29 @@ const customStyles = {
 Modal.setAppElement("body");
 
 export const Board: FC<userboard> = ({ id }) => {
+  const [logout, setLogout] = useState(false);
+
+  const handleLogout = () => {
+    setLogout(true);
+  };
+
+  const today = new Date();
   const [mainEvents, setMainEvents] = useState([{}]);
   const [modalIsOpen, setIsOpen] = useState(false);
   const [selectItem, setSelectItem] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [currentDate, setCurrentDate] = useState(today);
 
   useEffect(() => {
-    getEvents(id).then((r) => {
-      if (r) {
+    getEvents(id, formatDate(currentDate)).then((r) => {
+      if (r === null) {
+        setMainEvents([{}]);
+      } else {
         var events = [...r.events];
-        events = events.splice(1);
-        if (mainEvents.length < events.length) {
-          setMainEvents(events);
-        }
+        setMainEvents(events);
       }
     });
-  }, [mainEvents, []]);
+  }, [currentDate]);
 
   const afterOpenModal = () => {};
   const closeModal = () => setIsOpen(false);
@@ -53,9 +63,8 @@ export const Board: FC<userboard> = ({ id }) => {
   const handleAddItem = (e: any) => {
     e.preventDefault();
     var newEvents = [...mainEvents];
-    const [date, startTime, endTime, desc] = e.target;
+    const [startTime, endTime, desc] = e.target;
     newEvents.push({
-      date: date.value,
       startTime: startTime.value,
       endTime: endTime.value,
       desc: desc.value,
@@ -64,11 +73,10 @@ export const Board: FC<userboard> = ({ id }) => {
     setIsOpen(false);
   };
 
-  const handleSave = async (e: any) => {
-    e.preventDefault();
-    if (mainEvents.length < 250) {
+  const handleSave = async () => {
+    if (mainEvents.length < 100) {
       try {
-        const res = await postEvents(id, mainEvents);
+        const res = await postEvents(id, formatDate(currentDate), mainEvents);
         setSaved(res);
         setTimeout(() => {
           setSaved(false);
@@ -96,12 +104,15 @@ export const Board: FC<userboard> = ({ id }) => {
   };
 
   return (
-    <div className="w-full">
-      <h1
-        className={`text-center text-[32px] md:text-[42px] font-bold text-[#24669C] ${lemon.className} p-10`}
+    <div className="w-full flex-row">
+      <div className="w-full flex justify-center">
+        <NewCalendar setCurrentDate={setCurrentDate} />
+      </div>
+      <div
+        className={`w-full text-center text-[28px] md:text-[30px] font-bold m-4 ${lemon.className} text-[#24669C]`}
       >
-        {}
-      </h1>
+        {currentDate.toLocaleDateString()}
+      </div>
       <div className="w-full my-auto border-t-2 border-b-2 border-[#24669c5a] border-dashed pt-10 pb-10">
         {mainEvents.map((item: any, index) => {
           if (item.desc) {
@@ -116,7 +127,6 @@ export const Board: FC<userboard> = ({ id }) => {
                     <BiSolidTrashAlt className="w-[20px] text-red-600 cursor-pointer m-auto pointer-events-none" />
                   </button>
                 )}
-                <div className="w-1/5 font-bold">{item.date}</div>
                 <div className="w-1/5">
                   {item.startTime + " - " + item.endTime}
                 </div>
@@ -128,7 +138,7 @@ export const Board: FC<userboard> = ({ id }) => {
           }
         })}
       </div>
-      <div className="flex py-20">
+      <div className="flex p-20 md:flex-row flex-col h-[300px]">
         <button
           className="w-4/5 md:w-1/5 max-w-[600px] text-[#24669C] font-bold border-[#42A5F5] rounded-xl border-2 hover:bg-[#42A5F5] hover:text-white m-auto"
           onClick={openModal}
@@ -139,7 +149,7 @@ export const Board: FC<userboard> = ({ id }) => {
           className="w-4/5 md:w-1/5 max-w-[600px] text-[#24669C] font-bold border-[#42A5F5] rounded-xl border-2 hover:bg-[#42A5F5] hover:text-white m-auto"
           onClick={handleSave}
         >
-          Save List
+          Save
         </button>
         {saved && (
           <span className="my-auto text-green-700">
@@ -147,13 +157,26 @@ export const Board: FC<userboard> = ({ id }) => {
           </span>
         )}
       </div>
-      <div className="flex flex-row flex-wrap">
-        <button
-          className="w-4/5 md:w-1/5 max-w-[600px] text-[#ff2929] font-bold border-[#ff2929] rounded-xl border-2 hover:bg-[#ff2929] hover:text-white m-auto"
-          onClick={handleDeleteAll}
-        >
-          Delete All Entries
-        </button>
+      <div className="flex flex-row justify-center w-full">
+        <details className="cursor-pointer w-full text-center">
+          <summary>Menu</summary>
+          <div className="flex flex-row flex-wrap">
+            <button
+              className="w-4/5 md:w-1/5 max-w-[600px] text-[#ff2929] font-bold border-[#ff2929] rounded-xl border-2 hover:bg-[#ff2929] hover:text-white m-auto"
+              onClick={handleDeleteAll}
+            >
+              Delete All Entries
+            </button>
+          </div>
+          <div className="flex flex-row flex-wrap m-4">
+            <button
+              className="w-4/5 md:w-1/5 max-w-[600px] text-[#24669C] font-bold border-[#42A5F5] rounded-xl border-2 hover:bg-[#42A5F5] hover:text-white m-auto"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          </div>
+        </details>
       </div>
       <Modal
         isOpen={modalIsOpen}
@@ -163,13 +186,6 @@ export const Board: FC<userboard> = ({ id }) => {
         contentLabel="Example Modal"
       >
         <form className="flex flex-col" onSubmit={handleAddItem}>
-          <label>Date:</label>
-          <input
-            type="date"
-            name="date"
-            className="p-2 m-4 border-2"
-            id="date"
-          ></input>
           <label htmlFor="startTime">Start Time:</label>
           <input
             type="time"
@@ -196,6 +212,7 @@ export const Board: FC<userboard> = ({ id }) => {
           </button>
         </form>
       </Modal>
+      {logout && <Logout path="/" />}
     </div>
   );
 };

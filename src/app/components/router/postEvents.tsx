@@ -1,8 +1,12 @@
 import axios from "axios";
 
-export const postEvents = async (userId: string, events: any) => {
+export const postEvents = async (userId: string, date: string, events: any) => {
   var res = false;
-  const payload = JSON.stringify({ userId: userId, events: events });
+  const payload = JSON.stringify({
+    userId: userId,
+    date: date,
+    events: events,
+  });
   await axios
     .post(process.env.API_URL + "/events/create", { payload })
     .then((response) => {
