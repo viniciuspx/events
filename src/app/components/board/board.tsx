@@ -9,8 +9,10 @@ import { lemon } from "@/app/fonts/fonts";
 import Modal from "react-modal";
 import { BiSolidTrashAlt } from "react-icons/bi";
 import { BiCheckCircle } from "react-icons/bi";
+import { BiSolidXCircle } from "react-icons/bi";
 import { Logout } from "../logout/logout";
 import { formatDate } from "../utils/formatedDate";
+import { deleteByDate } from "../router/deleteByDate";
 
 interface userboard {
   id: string;
@@ -99,7 +101,15 @@ export const Board: FC<userboard> = ({ id }) => {
   };
 
   const handleDeleteAll = async () => {
-    await deleteAllEntries(id);
+    let del = confirm("Are you shure?");
+    if (del) {
+      await deleteAllEntries(id);
+      setMainEvents([{}]);
+    }
+  };
+
+  const handleDeleteByDate = async () => {
+    await deleteByDate(id, formatDate(currentDate));
     setMainEvents([{}]);
   };
 
@@ -114,6 +124,15 @@ export const Board: FC<userboard> = ({ id }) => {
         {currentDate.toLocaleDateString()}
       </div>
       <div className="w-full my-auto border-t-2 border-b-2 border-[#24669c5a] border-dashed pt-10 pb-10">
+        {selectItem && (
+          <button
+            onClick={handleDeleteByDate}
+            className="flex justify-center mx-auto border-solid border-2 rounded-xl p-2 border-[red]"
+          >
+            <BiSolidTrashAlt className="w-[20px] text-red-600 cursor-pointer m-auto pointer-events-none" />
+            <span className="text-red-600 font-bold">Delete All Events</span>
+          </button>
+        )}
         {mainEvents.map((item: any, index) => {
           if (item.desc) {
             return (
@@ -124,7 +143,7 @@ export const Board: FC<userboard> = ({ id }) => {
               >
                 {selectItem && (
                   <button id={String(index)} onClick={handleDeleteItem}>
-                    <BiSolidTrashAlt className="w-[20px] text-red-600 cursor-pointer m-auto pointer-events-none" />
+                    <BiSolidXCircle className="w-[20px] text-red-600 cursor-pointer m-auto pointer-events-none" />
                   </button>
                 )}
                 <div className="w-1/5">
