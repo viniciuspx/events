@@ -18,7 +18,7 @@ export const Trail: React.FC<{ open: boolean; children?: any }> = ({
   return (
     <div>
       {trail.map(({ height, ...style }, index) => (
-        <a.div key={index} className="text-white text-bold text-[6em]" style={style}>
+        <a.div key={index} className="text-white text-bold text-[4em]" style={style}>
           <a.div style={{ height }}>{items[index]}</a.div>
         </a.div>
       ))}

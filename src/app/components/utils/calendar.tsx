@@ -17,7 +17,7 @@ export const NewCalendar: FC<props> = ({ setCurrentDate }) => {
   }, [value]);
 
   return (
-    <div>
+    <div className="md:w-2/5 w-full">
       <Calendar onChange={onChange} value={value} />
     </div>
   );

@@ -5,14 +5,22 @@ import { getEvents } from "../router/getEvents";
 import { deleteAllEntries } from "../router/deleteAllEntries";
 import { NewCalendar } from "../utils/calendar";
 
-import { lemon } from "@/app/fonts/fonts";
 import Modal from "react-modal";
+
 import { BiSolidTrashAlt } from "react-icons/bi";
 import { BiCheckCircle } from "react-icons/bi";
 import { BiSolidXCircle } from "react-icons/bi";
-import { Logout } from "../logout/logout";
+import { BiEditAlt } from "react-icons/bi";
+import { BiDotsVertical } from "react-icons/bi";
+import { BiMeteor } from "react-icons/bi";
+
 import { formatDate } from "../utils/formatedDate";
 import { deleteByDate } from "../router/deleteByDate";
+import { sortEvents } from "../utils/sort";
+
+import backimg from "../../img/backdrop.jpg";
+import Image from "next/image";
+import { eventOverlapping } from "../utils/compareHours";
 
 interface userboard {
   id: string;
@@ -27,25 +35,21 @@ const customStyles = {
     marginRight: "-50%",
     transform: "translate(-50%, -50%)",
     padding: "20px",
-    border: "solid 2px #24669C",
+    border: "solid 2px #2e9c8e",
   },
 };
 
 Modal.setAppElement("body");
 
 export const Board: FC<userboard> = ({ id }) => {
-  const [logout, setLogout] = useState(false);
-
-  const handleLogout = () => {
-    setLogout(true);
-  };
-
   const today = new Date();
   const [mainEvents, setMainEvents] = useState([{}]);
-  const [modalIsOpen, setIsOpen] = useState(false);
+  const [addItemModalIsOpen, setAddIsOpen] = useState(false);
   const [selectItem, setSelectItem] = useState(false);
   const [saved, setSaved] = useState(false);
   const [currentDate, setCurrentDate] = useState(today);
+  const [editItemModalIsOpen, setEditIsOpen] = useState(false);
+  const [selectEditIndex, setSelectedEditIndex] = useState(0);
 
   useEffect(() => {
     getEvents(id, formatDate(currentDate)).then((r) => {
@@ -53,26 +57,33 @@ export const Board: FC<userboard> = ({ id }) => {
         setMainEvents([{}]);
       } else {
         var events = [...r.events];
-        setMainEvents(events);
+        setMainEvents(sortEvents(events));
       }
     });
   }, [currentDate]);
 
   const afterOpenModal = () => {};
-  const closeModal = () => setIsOpen(false);
-  const openModal = () => setIsOpen(true);
+  const closeModal = () => {
+    setAddIsOpen(false);
+    setEditIsOpen(false);
+  };
+  const openAddModal = () => setAddIsOpen(true);
 
   const handleAddItem = (e: any) => {
     e.preventDefault();
-    var newEvents = [...mainEvents];
     const [startTime, endTime, desc] = e.target;
-    newEvents.push({
-      startTime: startTime.value,
-      endTime: endTime.value,
-      desc: desc.value,
-    });
-    setMainEvents(newEvents);
-    setIsOpen(false);
+    if (!eventOverlapping(mainEvents, startTime.value, endTime.value)) {
+      var newEvents = [...mainEvents];
+      newEvents.push({
+        startTime: startTime.value,
+        endTime: endTime.value,
+        desc: desc.value,
+      });
+      setMainEvents(sortEvents(newEvents));
+    } else {
+      alert("Already exists an event in this period, not adding.");
+    }
+    setAddIsOpen(false);
   };
 
   const handleSave = async () => {
@@ -97,7 +108,7 @@ export const Board: FC<userboard> = ({ id }) => {
     const selectedIndex = Number(event.target.id);
     var tempList = [...mainEvents];
     tempList.splice(selectedIndex, 1);
-    setMainEvents(tempList);
+    setMainEvents(sortEvents(tempList));
   };
 
   const handleDeleteAll = async () => {
@@ -113,59 +124,108 @@ export const Board: FC<userboard> = ({ id }) => {
     setMainEvents([{}]);
   };
 
+  const handleEditMenuEvent = async (event: any) => {
+    setSelectedEditIndex(Number(event.target.id));
+    setEditIsOpen(true);
+  };
+
+  const handleEditEvent = async (event: any) => {
+    event.preventDefault();
+    var newEvents = [...mainEvents];
+    const [startTime, endTime, desc] = event.target;
+    newEvents[selectEditIndex] = {
+      startTime: startTime.value,
+      endTime: endTime.value,
+      desc: desc.value,
+    };
+    setMainEvents(sortEvents(newEvents));
+    setEditIsOpen(false);
+  };
+
   return (
-    <div className="w-full flex-row">
-      <div className="w-full flex justify-center">
-        <NewCalendar setCurrentDate={setCurrentDate} />
-      </div>
-      <div
-        className={`w-full text-center text-[28px] md:text-[30px] font-bold m-4 ${lemon.className} text-[#24669C]`}
-      >
-        {currentDate.toLocaleDateString()}
-      </div>
-      <div className="w-full my-auto border-t-2 border-b-2 border-[#24669c5a] border-dashed pt-10 pb-10">
-        {selectItem && (
-          <button
-            onClick={handleDeleteByDate}
-            className="flex justify-center mx-auto border-solid border-2 rounded-xl p-2 border-[red]"
+    <div className="md:w-[1200px] flex flex-col m-auto border-2 border-solid rounded-xl md:px-10 md:py-5 bg-white">
+      <div className="flex flex-col">
+        <div className="md:py-2 flex flex-row">
+          <NewCalendar setCurrentDate={setCurrentDate} />
+          <div className="w-full">
+            <img
+              src={backimg.src}
+              alt="field"
+              className="object-cover md:h-[282px] h-[0px] md:w-full w-[0px] object-bottom"
+            />
+          </div>
+        </div>
+        <div className="border-2 w-full m-auto">
+          <div
+            className={
+              "text-[20px] text-center p-2 md:text-[20px] font-bold text-black"
+            }
           >
-            <BiSolidTrashAlt className="w-[20px] text-red-600 cursor-pointer m-auto pointer-events-none" />
-            <span className="text-red-600 font-bold">Delete All Events</span>
-          </button>
-        )}
-        {mainEvents.map((item: any, index) => {
-          if (item.desc) {
-            return (
-              <div
-                className="p-2 border-b-2 flex flex-row flex-wrap text-center text-wrap overflow-auto hover:bg-[#0000000A]"
-                key={index}
-                onClick={handleSelectItem}
+            {currentDate.toLocaleDateString()}
+          </div>
+          <hr></hr>
+          {selectItem && (
+            <>
+              <button
+                onClick={handleDeleteByDate}
+                className="flex justify-center mx-auto border-solid p-2 m-2"
               >
-                {selectItem && (
-                  <button id={String(index)} onClick={handleDeleteItem}>
-                    <BiSolidXCircle className="w-[20px] text-red-600 cursor-pointer m-auto pointer-events-none" />
-                  </button>
-                )}
-                <div className="w-1/5">
-                  {item.startTime + " - " + item.endTime}
+                <BiSolidTrashAlt className="w-[20px] text-red-600 cursor-pointer m-auto pointer-events-none" />
+                <span className="text-red-600 font-bold">
+                  Delete all events on this date
+                </span>
+              </button>
+              <button
+                className="flex justify-center text-red-600 font-bold mx-auto"
+                onClick={handleDeleteAll}
+              >
+                <BiMeteor className="w-[20px] text-red-600 cursor-pointer m-auto pointer-events-none" />
+                Delete All Entries
+              </button>
+            </>
+          )}
+          <div className="flex flex-row text-[24px] m-2 cursor-pointer justify-end">
+            <BiDotsVertical onClick={handleSelectItem} />
+          </div>
+          {mainEvents.map((item: any, index) => {
+            if (item.desc) {
+              return (
+                <div
+                  className="p-2 divide-x-2 border-b-2 flex flex-row flex-wrap text-center text-wrap overflow-auto hover:bg-[#0000000A]"
+                  key={index}
+                  onClick={handleSelectItem}
+                >
+                  {selectItem && (
+                    <>
+                      <button id={String(index)} onClick={handleDeleteItem}>
+                        <BiSolidXCircle className="w-[20px] cursor-pointer m-auto pointer-events-none" />
+                      </button>
+                      <button id={String(index)} onClick={handleEditMenuEvent}>
+                        <BiEditAlt className="w-[20px] cursor-pointer m-auto pointer-events-none" />
+                      </button>
+                    </>
+                  )}
+                  <div className="w-1/5">
+                    {item.startTime + " - " + item.endTime}
+                  </div>
+                  <div className={selectItem ? `w-3/5` : `w-4/5`}>
+                    {item.desc}
+                  </div>
                 </div>
-                <div className={selectItem ? `w-2/5` : `w-3/5`}>
-                  {item.desc}
-                </div>
-              </div>
-            );
-          }
-        })}
+              );
+            }
+          })}
+        </div>
       </div>
-      <div className="flex p-20 md:flex-row flex-col h-[300px]">
+      <div className="flex md:flex-row flex-col h-[100px]">
         <button
-          className="w-4/5 md:w-1/5 max-w-[600px] text-[#24669C] font-bold border-[#42A5F5] rounded-xl border-2 hover:bg-[#42A5F5] hover:text-white m-auto"
-          onClick={openModal}
+          className="w-4/5 md:w-1/5 max-w-[600px] text-[#2e9c8e] font-bold border-[#2e9c8e] rounded-xl border-2 hover:bg-[#2e9c8e] hover:text-white m-auto"
+          onClick={openAddModal}
         >
-          Add Item
+          Add Event
         </button>
         <button
-          className="w-4/5 md:w-1/5 max-w-[600px] text-[#24669C] font-bold border-[#42A5F5] rounded-xl border-2 hover:bg-[#42A5F5] hover:text-white m-auto"
+          className="w-4/5 md:w-1/5 max-w-[600px] text-[#2e9c8e] font-bold border-[#2e9c8e] rounded-xl border-2 hover:bg-[#2e9c8e] hover:text-white m-auto"
           onClick={handleSave}
         >
           Save
@@ -176,35 +236,55 @@ export const Board: FC<userboard> = ({ id }) => {
           </span>
         )}
       </div>
-      <div className="flex flex-row justify-center w-full">
-        <details className="cursor-pointer w-full text-center">
-          <summary>Menu</summary>
-          <div className="flex flex-row flex-wrap">
-            <button
-              className="w-4/5 md:w-1/5 max-w-[600px] text-[#ff2929] font-bold border-[#ff2929] rounded-xl border-2 hover:bg-[#ff2929] hover:text-white m-auto"
-              onClick={handleDeleteAll}
-            >
-              Delete All Entries
-            </button>
-          </div>
-          <div className="flex flex-row flex-wrap m-4">
-            <button
-              className="w-4/5 md:w-1/5 max-w-[600px] text-[#24669C] font-bold border-[#42A5F5] rounded-xl border-2 hover:bg-[#42A5F5] hover:text-white m-auto"
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
-          </div>
-        </details>
-      </div>
+
       <Modal
-        isOpen={modalIsOpen}
+        isOpen={addItemModalIsOpen}
         onAfterOpen={afterOpenModal}
         onRequestClose={closeModal}
         style={customStyles}
         contentLabel="Example Modal"
       >
         <form className="flex flex-col" onSubmit={handleAddItem}>
+          <label htmlFor="startTime" className="font-bold">
+            Start Time:
+          </label>
+          <input
+            type="time"
+            name="startTime"
+            className="p-2 m-4 border-2"
+            id="startTime"
+          ></input>
+          <label htmlFor="endTime" className="font-bold">
+            End Time:
+          </label>
+          <input
+            type="time"
+            name="endTime"
+            className="p-2 m-4 border-2"
+            id="endTime"
+          ></input>
+          <label htmlFor="task" className="font-bold">
+            Description:
+          </label>
+          <textarea
+            id="desc"
+            placeholder="Description..."
+            maxLength={144}
+            className="p-2 md:w-[400px] md:h-[150px] border-2 m-4 break-words"
+          ></textarea>
+          <button className="w-2/5 md:w-2/5 max-w-[600px] text-[#2e9c8e] font-bold border-[#2e9c8e] rounded-xl border-2 hover:bg-[#2e9c8e] hover:text-white m-auto">
+            Add
+          </button>
+        </form>
+      </Modal>
+      <Modal
+        isOpen={editItemModalIsOpen}
+        onAfterOpen={afterOpenModal}
+        onRequestClose={closeModal}
+        style={customStyles}
+        contentLabel="Example Modal"
+      >
+        <form className="flex flex-col" onSubmit={handleEditEvent}>
           <label htmlFor="startTime">Start Time:</label>
           <input
             type="time"
@@ -226,12 +306,11 @@ export const Board: FC<userboard> = ({ id }) => {
             maxLength={144}
             className="p-2 md:w-[400px] md:h-[150px] border-2 m-4 break-words"
           ></textarea>
-          <button className="w-2/5 md:w-2/5 max-w-[600px] text-[#24669C] font-bold border-[#42A5F5] rounded-xl border-2 hover:bg-[#42A5F5] hover:text-white m-auto">
-            Add
+          <button className="w-2/5 md:w-2/5 max-w-[600px] text-[#2e9c8e] font-bold border-[#2e9c8e] rounded-xl border-2 hover:bg-[#2e9c8e] hover:text-white m-auto">
+            Edit
           </button>
         </form>
       </Modal>
-      {logout && <Logout path="/" />}
     </div>
   );
 };

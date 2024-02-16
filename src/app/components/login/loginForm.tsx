@@ -35,7 +35,7 @@ export const LoginForm = () => {
   return (
     <div className="w-full h-lvh flex flex-wrap justify-center">
       <span
-        className={`md:w-2/5 md:text-[64px] text-[48px] text-center inline-block align-top m-auto text-[#42A5F5] ${lemon.className}`}
+        className={`md:w-2/5 md:text-[64px] text-[48px] text-center inline-block align-top m-auto text-[#2e9c8e] ${lemon.className}`}
       >
         Events
         <hr />
@@ -47,20 +47,20 @@ export const LoginForm = () => {
         >
           <input
             type="text"
-            className="w-4/5 md:w-2/5 h-[25px] border-[2px] border-[#24669C] my-2 mx-auto p-4 text-center rounded-md bg-transparent text-black"
+            className="w-4/5 md:w-2/5 h-[25px] border-[2px] border-[#2e9c8e] my-2 mx-auto p-4 text-center rounded-md bg-transparent text-black"
             placeholder="E-mail"
             name="email"
           ></input>
           <input
             type="password"
-            className="w-4/5 md:w-2/5 h-[25px] border-[2px] border-[#24669C] my-2 mx-auto p-4 text-center rounded-md bg-transparent text-black"
+            className="w-4/5 md:w-2/5 h-[25px] border-[2px] border-[#2e9c8e] my-2 mx-auto p-4 text-center rounded-md bg-transparent text-black"
             placeholder="Password"
             name="password"
           ></input>
           {loading && <BiLoaderAlt className="m-auto animate-spin" />}
           <button
             type="submit"
-            className="w-2/5 md:w-2/5 max-w-[600px] text-white font-bold border-[#42A5F5] bg-[#42A5F5] rounded-xl border-2 hover:bg-white hover:text-[#24669C] mx-auto my-2"
+            className="w-2/5 md:w-2/5 max-w-[600px] text-white font-bold border-[#2e9c8e] bg-[#2e9c8e] rounded-xl border-2 hover:bg-white hover:text-[#2e9c8e] mx-auto my-2"
           >
             Login
           </button>
