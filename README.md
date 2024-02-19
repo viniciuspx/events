@@ -9,7 +9,7 @@ Back-end: **NodeJS**, **TypeScript**, **ExpressJS** and **MongoDB**
 
 ## To run it you need **yarn** and latest **NodeJS**
 
-To install an prepare enviroment
+To install and prepare enviroment
 ```
 yarn
 ```
