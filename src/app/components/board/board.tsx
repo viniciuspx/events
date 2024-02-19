@@ -1,11 +1,13 @@
+"use client";
+
+import Modal from "react-modal";
+
 import { FC, useEffect, useState } from "react";
 
 import { postEvents } from "../router/postEvents";
 import { getEvents } from "../router/getEvents";
 import { deleteAllEntries } from "../router/deleteAllEntries";
-import { NewCalendar } from "../utils/calendar";
-
-import Modal from "react-modal";
+import { deleteByDate } from "../router/deleteByDate";
 
 import { BiSolidTrashAlt } from "react-icons/bi";
 import { BiCheckCircle } from "react-icons/bi";
@@ -14,13 +16,13 @@ import { BiEditAlt } from "react-icons/bi";
 import { BiDotsVertical } from "react-icons/bi";
 import { BiMeteor } from "react-icons/bi";
 
-import { formatDate } from "../utils/formatedDate";
-import { deleteByDate } from "../router/deleteByDate";
-import { sortEvents } from "../utils/sort";
-
 import backimg from "../../img/backdrop.jpg";
-import Image from "next/image";
+
+import { NewCalendar } from "../utils/calendar";
+import { formatDate } from "../utils/formatedDate";
+import { sortEvents } from "../utils/sort";
 import { eventOverlapping } from "../utils/compareHours";
+import { useFirstRender } from "../utils/useFirstRender";
 
 interface userboard {
   id: string;
@@ -51,6 +53,8 @@ export const Board: FC<userboard> = ({ id }) => {
   const [editItemModalIsOpen, setEditIsOpen] = useState(false);
   const [selectEditIndex, setSelectedEditIndex] = useState(0);
   const [allDayEvent, SetAllDayEvent] = useState(false);
+  const [save, setSave] = useState(false);
+  const firstRender = useFirstRender();
 
   useEffect(() => {
     getEvents(id, formatDate(currentDate)).then((r) => {
@@ -70,6 +74,8 @@ export const Board: FC<userboard> = ({ id }) => {
     SetAllDayEvent(false);
   };
   const openAddModal = () => setAddIsOpen(true);
+  const handleSelectItem = () => setSelectItem(!selectItem);
+  const handleAllDayEvent = () => SetAllDayEvent(!allDayEvent);
 
   const handleAddItem = (e: any) => {
     e.preventDefault();
@@ -83,7 +89,9 @@ export const Board: FC<userboard> = ({ id }) => {
       });
       setMainEvents(sortEvents(newEvents));
       SetAllDayEvent(false);
-    } else if (!eventOverlapping(mainEvents, startTime.value, endTime.value)) {
+    } else if (
+      !eventOverlapping(mainEvents, startTime.value, endTime.value, -1)
+    ) {
       var newEvents = [...mainEvents];
       newEvents.push({
         startTime: startTime.value,
@@ -95,13 +103,21 @@ export const Board: FC<userboard> = ({ id }) => {
       alert("Already exists an event in this period, not adding.");
     }
     setAddIsOpen(false);
+    setSave(true);
   };
+
+  useEffect(() => {
+    if (!firstRender && save) {
+      handleSave();
+    }
+  }, [save]);
 
   const handleSave = async () => {
     if (mainEvents.length < 100) {
       try {
         const res = await postEvents(id, formatDate(currentDate), mainEvents);
         setSaved(res);
+        setSave(false);
         setTimeout(() => {
           setSaved(false);
         }, 2000);
@@ -113,13 +129,12 @@ export const Board: FC<userboard> = ({ id }) => {
     }
   };
 
-  const handleSelectItem = () => setSelectItem(!selectItem);
-
   const handleDeleteItem = (event: any) => {
     const selectedIndex = Number(event.target.id);
     var tempList = [...mainEvents];
     tempList.splice(selectedIndex, 1);
     setMainEvents(sortEvents(tempList));
+    setSave(true);
   };
 
   const handleDeleteAll = async () => {
@@ -142,18 +157,37 @@ export const Board: FC<userboard> = ({ id }) => {
 
   const handleEditEvent = async (event: any) => {
     event.preventDefault();
-    var newEvents = [...mainEvents];
-    const [startTime, endTime, desc] = event.target;
-    newEvents[selectEditIndex] = {
-      startTime: startTime.value,
-      endTime: endTime.value,
-      desc: desc.value,
-    };
-    setMainEvents(sortEvents(newEvents));
+    const [startTime, endTime, checkbox, desc] = event.target;
+    if (checkbox.checked) {
+      var newEvents = [...mainEvents];
+      newEvents[selectEditIndex] = {
+        startTime: "entireday",
+        endTime: "entireday",
+        desc: desc.value,
+      };
+      setMainEvents(sortEvents(newEvents));
+      SetAllDayEvent(false);
+    } else if (
+      !eventOverlapping(
+        mainEvents,
+        startTime.value,
+        endTime.value,
+        selectEditIndex
+      )
+    ) {
+      var newEvents = [...mainEvents];
+      newEvents[selectEditIndex] = {
+        startTime: startTime.value,
+        endTime: endTime.value,
+        desc: desc.value,
+      };
+      setMainEvents(sortEvents(newEvents));
+    } else {
+      alert("Already exists an event in this period, not adding.");
+    }
     setEditIsOpen(false);
+    setSave(true);
   };
-
-  const handleAllDayEvent = () => SetAllDayEvent(!allDayEvent);
 
   return (
     <div className="md:w-[1200px] flex flex-col m-auto border-2 border-solid rounded-xl md:px-10 md:py-5 bg-white">
@@ -239,12 +273,6 @@ export const Board: FC<userboard> = ({ id }) => {
         >
           Add Event
         </button>
-        <button
-          className="w-4/5 md:w-1/5 max-w-[600px] text-[#2e9c8e] font-bold border-[#2e9c8e] rounded-xl border-2 hover:bg-[#2e9c8e] hover:text-white m-auto"
-          onClick={handleSave}
-        >
-          Save
-        </button>
         {saved && (
           <span className="my-auto text-green-700">
             <BiCheckCircle />
@@ -314,21 +342,41 @@ export const Board: FC<userboard> = ({ id }) => {
         contentLabel="Example Modal"
       >
         <form className="flex flex-col" onSubmit={handleEditEvent}>
-          <label htmlFor="startTime">Start Time:</label>
+          <label htmlFor="startTime" className="font-bold">
+            Start Time:
+          </label>
           <input
             type="time"
             name="startTime"
-            className="p-2 m-4 border-2"
+            className={`p-2 m-4 border-2 ${
+              allDayEvent && "bg-[#afabab] text-[#afabab]"
+            }`}
             id="startTime"
+            disabled={allDayEvent}
           ></input>
-          <label htmlFor="endTime">End Time:</label>
+          <label htmlFor="endTime" className="font-bold">
+            End Time:
+          </label>
           <input
             type="time"
             name="endTime"
-            className="p-2 m-4 border-2"
+            className={`p-2 m-4 border-2 ${
+              allDayEvent && "bg-[#afabab] text-[#afabab]"
+            }`}
             id="endTime"
+            disabled={allDayEvent}
           ></input>
-          <label htmlFor="task">Description:</label>
+          <div className="m-auto">
+            <input
+              type="checkbox"
+              className="m-auto"
+              onClick={handleAllDayEvent}
+            ></input>
+            <label className="font-bold m-auto"> All Day</label>
+          </div>
+          <label htmlFor="desc" className="font-bold">
+            Description:
+          </label>
           <textarea
             id="desc"
             placeholder="Description..."

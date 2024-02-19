@@ -1,25 +1,24 @@
 export const eventOverlapping = (
   events: any,
   startTime: string,
-  endTime: string
+  endTime: string,
+  skipId: Number
 ) => {
-  let overllaped = false;
-  if (events) {
-    events.forEach((event: any) => {
-      if (
-        event.startTime === "entireday" ||
-        (event.startTime &&
-          event.endTime &&
-          startTime &&
-          endTime &&
-          Number(startTime.replace(":", "")) <
+  let overlapped = false;
+  if (events && startTime && endTime) {
+    events.forEach((event: any, index: number) => {
+      if (event.startTime && event.endTime && skipId !== index) {
+        if (
+          event.startTime === "entireday" ||
+          (Number(startTime.replace(":", "")) <
             Number(event.endTime.replace(":", "")) &&
-          Number(endTime.replace(":", "")) >
-            Number(event.startTime.replace(":", "")))
-      ) {
-        overllaped = true;
+            Number(endTime.replace(":", "")) >
+              Number(event.startTime.replace(":", "")))
+        ) {
+          overlapped = true;
+        }
       }
     });
-    return overllaped;
+    return overlapped;
   }
 };
