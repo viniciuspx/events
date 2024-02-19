@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "../utils/button";
-import { lemon } from "@/app/fonts/fonts";
+import { dancingScript, lemon } from "@/app/fonts/fonts";
 import { login } from "../router/login";
 import { useRouter } from "next/navigation";
 import { setLoggedIn } from "../dashboard";
@@ -35,7 +35,7 @@ export const LoginForm = () => {
   return (
     <div className="w-full h-lvh flex flex-wrap justify-center">
       <span
-        className={`md:w-2/5 md:text-[64px] text-[48px] text-center inline-block align-top m-auto text-[#2e9c8e] ${lemon.className}`}
+        className={`md:w-2/5 md:text-[96px] text-[64px] text-center inline-block align-top m-auto text-[#2e9c8e] ${dancingScript.className}`}
       >
         Events
         <hr />

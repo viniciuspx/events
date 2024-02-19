@@ -50,6 +50,7 @@ export const Board: FC<userboard> = ({ id }) => {
   const [currentDate, setCurrentDate] = useState(today);
   const [editItemModalIsOpen, setEditIsOpen] = useState(false);
   const [selectEditIndex, setSelectedEditIndex] = useState(0);
+  const [allDayEvent, SetAllDayEvent] = useState(false);
 
   useEffect(() => {
     getEvents(id, formatDate(currentDate)).then((r) => {
@@ -66,13 +67,23 @@ export const Board: FC<userboard> = ({ id }) => {
   const closeModal = () => {
     setAddIsOpen(false);
     setEditIsOpen(false);
+    SetAllDayEvent(false);
   };
   const openAddModal = () => setAddIsOpen(true);
 
   const handleAddItem = (e: any) => {
     e.preventDefault();
-    const [startTime, endTime, desc] = e.target;
-    if (!eventOverlapping(mainEvents, startTime.value, endTime.value)) {
+    const [startTime, endTime, checkbox, desc] = e.target;
+    if (checkbox.checked) {
+      var newEvents = [...mainEvents];
+      newEvents.push({
+        startTime: "entireday",
+        endTime: "entireday",
+        desc: desc.value,
+      });
+      setMainEvents(sortEvents(newEvents));
+      SetAllDayEvent(false);
+    } else if (!eventOverlapping(mainEvents, startTime.value, endTime.value)) {
       var newEvents = [...mainEvents];
       newEvents.push({
         startTime: startTime.value,
@@ -142,6 +153,8 @@ export const Board: FC<userboard> = ({ id }) => {
     setEditIsOpen(false);
   };
 
+  const handleAllDayEvent = () => SetAllDayEvent(!allDayEvent);
+
   return (
     <div className="md:w-[1200px] flex flex-col m-auto border-2 border-solid rounded-xl md:px-10 md:py-5 bg-white">
       <div className="flex flex-col">
@@ -206,7 +219,9 @@ export const Board: FC<userboard> = ({ id }) => {
                     </>
                   )}
                   <div className="w-1/5">
-                    {item.startTime + " - " + item.endTime}
+                    {item.startTime === "entireday"
+                      ? "All day"
+                      : item.startTime + " - " + item.endTime}
                   </div>
                   <div className={selectItem ? `w-3/5` : `w-4/5`}>
                     {item.desc}
@@ -251,8 +266,11 @@ export const Board: FC<userboard> = ({ id }) => {
           <input
             type="time"
             name="startTime"
-            className="p-2 m-4 border-2"
+            className={`p-2 m-4 border-2 ${
+              allDayEvent && "bg-[#afabab] text-[#afabab]"
+            }`}
             id="startTime"
+            disabled={allDayEvent}
           ></input>
           <label htmlFor="endTime" className="font-bold">
             End Time:
@@ -260,9 +278,20 @@ export const Board: FC<userboard> = ({ id }) => {
           <input
             type="time"
             name="endTime"
-            className="p-2 m-4 border-2"
+            className={`p-2 m-4 border-2 ${
+              allDayEvent && "bg-[#afabab] text-[#afabab]"
+            }`}
             id="endTime"
+            disabled={allDayEvent}
           ></input>
+          <div className="m-auto">
+            <input
+              type="checkbox"
+              className="m-auto"
+              onClick={handleAllDayEvent}
+            ></input>
+            <label className="font-bold m-auto"> All Day</label>
+          </div>
           <label htmlFor="task" className="font-bold">
             Description:
           </label>

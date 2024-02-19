@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Trail } from "../animations/trail";
 import { Button } from "../utils/button";
-import { lemon } from "@/app/fonts/fonts";
+import { dancingScript, lemon, monteSerrat } from "@/app/fonts/fonts";
 
 export const MakeHome = () => {
   const [open, setOpen] = useState(false);
@@ -20,18 +20,18 @@ export const MakeHome = () => {
         className="w-0 md:w-8/12 bg-[#2e9c8e] flex justify-center"
         onClick={handleClick}
       >
-        <div className="m-auto">
+        <div className="m-auto invisible md:visible">
           <Trail open={open}>
-            <span><span className={`${lemon.className}`}>Events</span> is an easy</span>
-            <span>way to organize</span>
-            <span>your day</span>
+            <span className={`${monteSerrat.className}`}>Events is an easy</span>
+            <span className={`${monteSerrat.className}`}>way to organize</span>
+            <span className={`${monteSerrat.className}`}>your day.</span>
           </Trail>
         </div>
       </div>
       <div className="w-full md:w-4/12 flex flex-col flex-wrap border-l-2 md:border-[#2e9c8e]">
         <div className="md:w-full w-full flex h-2/5 justify-center flex-wrap flex-col">
           <span
-            className={`md:w-3/5 md:text-[30px] text-[24px] text-center inline-block align-top m-auto text-[#2e9c8e] ${lemon.className}`}
+            className={`md:w-3/5 md:text-[64px] text-[36px] text-center inline-block align-top m-auto text-[#2e9c8e] ${dancingScript.className}`}
           >
             Events
             <hr />

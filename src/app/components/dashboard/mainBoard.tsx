@@ -13,7 +13,7 @@ export const CreateDashBoard: FC<dashBoardProps> = ({ user, id }) => {
 
   const handleLogout = () => {
     setLogout(true);
-  }
+  };
 
   return (
     <div className="flex flex-col md:w-full w-full md:h-lvh custom-bg h-screen overflow-auto">
@@ -21,7 +21,21 @@ export const CreateDashBoard: FC<dashBoardProps> = ({ user, id }) => {
         <h2 className="text-[16px] md:text-[22px] text-white font-bold">
           Welcome! {capitalizeFirstLetter(user)}
         </h2>
-        <button onClick={handleLogout} className="font-bold text-white hover:text-[#174942]">Logout</button>
+        <div>
+          <a
+            className="font-bold p-4 text-white hover:text-[#174942] cursor-pointer"
+            href="https://viniciuspx.netlify.app/"
+            target="_blank"
+          >
+            About
+          </a>
+          <button
+            onClick={handleLogout}
+            className="font-bold text-white hover:text-[#174942]"
+          >
+            Logout
+          </button>
+        </div>
       </div>
       <div className="p-2 h-10/12 w-full md:h-lvh flex m-auto">
         <Board id={id} />

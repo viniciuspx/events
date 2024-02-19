@@ -7,14 +7,15 @@ export const eventOverlapping = (
   if (events) {
     events.forEach((event: any) => {
       if (
-        event.startTime &&
-        event.endTime &&
-        startTime &&
-        endTime &&
-        Number(startTime.replace(":", "")) <
-          Number(event.endTime.replace(":", "")) &&
-        Number(endTime.replace(":", "")) >
-          Number(event.startTime.replace(":", ""))
+        event.startTime === "entireday" ||
+        (event.startTime &&
+          event.endTime &&
+          startTime &&
+          endTime &&
+          Number(startTime.replace(":", "")) <
+            Number(event.endTime.replace(":", "")) &&
+          Number(endTime.replace(":", "")) >
+            Number(event.startTime.replace(":", "")))
       ) {
         overllaped = true;
       }
