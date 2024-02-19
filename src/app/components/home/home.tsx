@@ -7,12 +7,11 @@ import { dancingScript, lemon, monteSerrat } from "@/app/fonts/fonts";
 
 export const MakeHome = () => {
   const [open, setOpen] = useState(false);
-
   const handleClick = () => setOpen(!open);
 
-  setTimeout(() => {
-    setOpen(!open);
-  }, 4000);
+  useEffect(() => {
+    setOpen(true);
+  },[])
 
   return (
     <div className="h-lvh flex flex-row">
