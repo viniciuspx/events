@@ -47,7 +47,7 @@ Modal.setAppElement("body");
 export const Board: FC<userboard> = ({ id }) => {
   const today = new Date();
   const firstRender = useFirstRender();
-  
+
   const [mainEvents, setMainEvents] = useState([{}]);
   const [addItemModalIsOpen, setAddIsOpen] = useState(false);
   const [selectItem, setSelectItem] = useState(false);
@@ -161,13 +161,19 @@ export const Board: FC<userboard> = ({ id }) => {
     event.preventDefault();
     const [startTime, endTime, checkbox, desc] = event.target;
     if (checkbox.checked) {
-      var newEvents = [...mainEvents];
-      newEvents[selectEditIndex] = {
-        startTime: "entireday",
-        endTime: "entireday",
-        desc: desc.value,
-      };
-      setMainEvents(sortEvents(newEvents));
+      if (
+        !eventOverlapping(mainEvents, "entireday", "entireday", selectEditIndex)
+      ) {
+        var newEvents = [...mainEvents];
+        newEvents[selectEditIndex] = {
+          startTime: "entireday",
+          endTime: "entireday",
+          desc: desc.value,
+        };
+        setMainEvents(sortEvents(newEvents));
+      } else {
+        alert("Already exists an event in this period, not adding.");
+      }
       SetAllDayEvent(false);
     } else if (
       !eventOverlapping(
