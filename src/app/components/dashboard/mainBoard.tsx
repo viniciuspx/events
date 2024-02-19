@@ -2,6 +2,7 @@ import { FC, useState } from "react";
 import { Board } from "../board/board";
 import { capitalizeFirstLetter } from "../utils/capitalize";
 import { Logout } from "../logout/logout";
+import { monteSerrat } from "@/app/fonts/fonts";
 
 interface dashBoardProps {
   user: string;
@@ -16,7 +17,7 @@ export const CreateDashBoard: FC<dashBoardProps> = ({ user, id }) => {
   };
 
   return (
-    <div className="flex flex-col md:w-full w-full md:h-lvh custom-bg h-screen overflow-auto">
+    <div className={`flex flex-col md:w-full w-full md:h-lvh custom-bg h-screen overflow-auto ${monteSerrat.className}`}>
       <div className="w-full h-2/12 md:h-2/12 md:border-b-2 p-6 md:border-[#2e9c8e] flex flex-row justify-between bg-[#2e9c8e]">
         <h2 className="text-[16px] md:text-[22px] text-white font-bold">
           Welcome! {capitalizeFirstLetter(user)}

@@ -23,6 +23,7 @@ import { formatDate } from "../utils/formatedDate";
 import { sortEvents } from "../utils/sort";
 import { eventOverlapping } from "../utils/compareHours";
 import { useFirstRender } from "../utils/useFirstRender";
+import { monteSerrat } from "@/app/fonts/fonts";
 
 interface userboard {
   id: string;
@@ -45,6 +46,8 @@ Modal.setAppElement("body");
 
 export const Board: FC<userboard> = ({ id }) => {
   const today = new Date();
+  const firstRender = useFirstRender();
+  
   const [mainEvents, setMainEvents] = useState([{}]);
   const [addItemModalIsOpen, setAddIsOpen] = useState(false);
   const [selectItem, setSelectItem] = useState(false);
@@ -54,7 +57,6 @@ export const Board: FC<userboard> = ({ id }) => {
   const [selectEditIndex, setSelectedEditIndex] = useState(0);
   const [allDayEvent, SetAllDayEvent] = useState(false);
   const [save, setSave] = useState(false);
-  const firstRender = useFirstRender();
 
   useEffect(() => {
     getEvents(id, formatDate(currentDate)).then((r) => {
@@ -190,7 +192,9 @@ export const Board: FC<userboard> = ({ id }) => {
   };
 
   return (
-    <div className="md:w-[1200px] flex flex-col m-auto border-2 border-solid rounded-xl md:px-10 md:py-5 bg-white">
+    <div
+      className={`md:w-[1200px] flex flex-col m-auto border-2 border-solid rounded-xl md:px-10 md:py-5 bg-white shadow-xl shadow-[#0000008a] ${monteSerrat.className}`}
+    >
       <div className="flex flex-col">
         <div className="md:py-2 flex flex-row">
           <NewCalendar setCurrentDate={setCurrentDate} />
