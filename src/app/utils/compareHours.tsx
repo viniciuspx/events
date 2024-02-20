@@ -10,7 +10,6 @@ export const eventOverlapping = (
       if (event.startTime && event.endTime && skipId !== index) {
         if (
           event.startTime === "entireday" ||
-          startTime === "entireday" ||
           (Number(startTime.replace(":", "")) <
             Number(event.endTime.replace(":", "")) &&
             Number(endTime.replace(":", "")) >

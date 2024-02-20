@@ -44,6 +44,8 @@ const customStyles = {
 
 Modal.setAppElement("body");
 
+// Board contains the main logic of the project, largest class
+
 export const Board: FC<userboard> = ({ id }) => {
   const today = new Date();
   const firstRender = useFirstRender();
@@ -58,6 +60,8 @@ export const Board: FC<userboard> = ({ id }) => {
   const [allDayEvent, SetAllDayEvent] = useState(false);
   const [save, setSave] = useState(false);
 
+  // Effects triggered
+
   useEffect(() => {
     getEvents(id, formatDate(currentDate)).then((r) => {
       if (r === null) {
@@ -69,6 +73,14 @@ export const Board: FC<userboard> = ({ id }) => {
     });
   }, [currentDate]);
 
+  useEffect(() => {
+    if (!firstRender && save) {
+      handleSave();
+    }
+  }, [save]);
+
+  // Helpers for variables
+
   const afterOpenModal = () => {};
   const closeModal = () => {
     setAddIsOpen(false);
@@ -79,10 +91,12 @@ export const Board: FC<userboard> = ({ id }) => {
   const handleSelectItem = () => setSelectItem(!selectItem);
   const handleAllDayEvent = () => SetAllDayEvent(!allDayEvent);
 
+  // Main logic functions
+
   const handleAddItem = (e: any) => {
     e.preventDefault();
     const [startTime, endTime, checkbox, desc] = e.target;
-    if (checkbox.checked) {
+    if (checkbox.checked && mainEvents.length === 1) {
       var newEvents = [...mainEvents];
       newEvents.push({
         startTime: "entireday",
@@ -92,6 +106,7 @@ export const Board: FC<userboard> = ({ id }) => {
       setMainEvents(sortEvents(newEvents));
       SetAllDayEvent(false);
     } else if (
+      !checkbox.checked &&
       !eventOverlapping(mainEvents, startTime.value, endTime.value, -1)
     ) {
       var newEvents = [...mainEvents];
@@ -104,15 +119,46 @@ export const Board: FC<userboard> = ({ id }) => {
     } else {
       alert("Already exists an event in this period, not adding.");
     }
+    SetAllDayEvent(false);
     setAddIsOpen(false);
     setSave(true);
   };
 
-  useEffect(() => {
-    if (!firstRender && save) {
-      handleSave();
+  const handleEditEvent = async (event: any) => {
+    event.preventDefault();
+    const [startTime, endTime, checkbox, desc] = event.target;
+    if (checkbox.checked && mainEvents.length === 2) {
+      var newEvents = [...mainEvents];
+      newEvents[selectEditIndex] = {
+        startTime: "entireday",
+        endTime: "entireday",
+        desc: desc.value,
+      };
+      setMainEvents(sortEvents(newEvents));
+      SetAllDayEvent(false);
+    } else if (
+      !checkbox.checked &&
+      !eventOverlapping(
+        mainEvents,
+        startTime.value,
+        endTime.value,
+        selectEditIndex
+      )
+    ) {
+      var newEvents = [...mainEvents];
+      newEvents[selectEditIndex] = {
+        startTime: startTime.value,
+        endTime: endTime.value,
+        desc: desc.value,
+      };
+      setMainEvents(sortEvents(newEvents));
+    } else {
+      alert("Already exists an event in this period, not adding.");
     }
-  }, [save]);
+    SetAllDayEvent(false);
+    setEditIsOpen(false);
+    setSave(true);
+  };
 
   const handleSave = async () => {
     if (mainEvents.length < 100) {
@@ -157,45 +203,16 @@ export const Board: FC<userboard> = ({ id }) => {
     setEditIsOpen(true);
   };
 
-  const handleEditEvent = async (event: any) => {
-    event.preventDefault();
-    const [startTime, endTime, checkbox, desc] = event.target;
-    if (checkbox.checked) {
-      if (
-        !eventOverlapping(mainEvents, "entireday", "entireday", selectEditIndex)
-      ) {
-        var newEvents = [...mainEvents];
-        newEvents[selectEditIndex] = {
-          startTime: "entireday",
-          endTime: "entireday",
-          desc: desc.value,
-        };
-        setMainEvents(sortEvents(newEvents));
-      } else {
-        alert("Already exists an event in this period, not adding.");
+  const getEditValue = (input: string) => {
+    if (selectEditIndex) {
+      const object: any = mainEvents[selectEditIndex];
+      if (object) {
+        return object[input];
       }
-      SetAllDayEvent(false);
-    } else if (
-      !eventOverlapping(
-        mainEvents,
-        startTime.value,
-        endTime.value,
-        selectEditIndex
-      )
-    ) {
-      var newEvents = [...mainEvents];
-      newEvents[selectEditIndex] = {
-        startTime: startTime.value,
-        endTime: endTime.value,
-        desc: desc.value,
-      };
-      setMainEvents(sortEvents(newEvents));
-    } else {
-      alert("Already exists an event in this period, not adding.");
     }
-    setEditIsOpen(false);
-    setSave(true);
   };
+
+  // Return of the JSX
 
   return (
     <div
@@ -363,6 +380,7 @@ export const Board: FC<userboard> = ({ id }) => {
             }`}
             id="startTime"
             disabled={allDayEvent}
+            defaultValue={getEditValue("startTime")}
           ></input>
           <label htmlFor="endTime" className="font-bold">
             End Time:
@@ -375,12 +393,14 @@ export const Board: FC<userboard> = ({ id }) => {
             }`}
             id="endTime"
             disabled={allDayEvent}
+            defaultValue={getEditValue("endTime")}
           ></input>
           <div className="m-auto">
             <input
               type="checkbox"
               className="m-auto"
               onClick={handleAllDayEvent}
+              defaultChecked={getEditValue("startTime") === "entireday"}
             ></input>
             <label className="font-bold m-auto"> All Day</label>
           </div>
@@ -392,6 +412,7 @@ export const Board: FC<userboard> = ({ id }) => {
             placeholder="Description..."
             maxLength={144}
             className="p-2 md:w-[400px] md:h-[150px] border-2 m-4 break-words"
+            defaultValue={getEditValue("desc")}
           ></textarea>
           <button className="w-2/5 md:w-2/5 max-w-[600px] text-[#2e9c8e] font-bold border-[#2e9c8e] rounded-xl border-2 hover:bg-[#2e9c8e] hover:text-white m-auto">
             Edit
