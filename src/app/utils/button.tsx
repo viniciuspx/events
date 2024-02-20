@@ -14,7 +14,7 @@ const handleOnClick = () => {
 
 export const Button: FC<buttonProps> = ({ buttonText, link, customClass }) => {
   return (
-    <a href={link ? link : ""} className={`w-4/5 md:w-4/5 max-w-[300px] flex m-2 flex-wrap justify-center ${customClass}`}>
+    <a href={link ? link : ""} className={`w-2/5 md:w-4/5 max-w-[300px] flex m-2 flex-wrap justify-center ${customClass}`}>
       <button
         type="button"
         onClick={handleOnClick}

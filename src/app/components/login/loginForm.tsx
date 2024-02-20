@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "../../utils/button";
-import { dancingScript, lemon } from "@/app/assets/fonts/fonts";
+import { dancingScript, monteSerrat } from "@/app/assets/fonts/fonts";
 import { login } from "../../router/login";
 import { useRouter } from "next/navigation";
 import { setLoggedIn } from "../dashboard";
@@ -45,16 +45,18 @@ export const LoginForm = () => {
           className="w-4/5 flex flex-col flex-wrap justify-center m-auto"
           onSubmit={HandleSubmit}
         >
+          <label className={`mx-auto text-[#2e9c8e] font-bold ${monteSerrat.className}`}>E-mail</label>
           <input
             type="text"
             className="w-4/5 md:w-2/5 h-[25px] border-[2px] border-[#2e9c8e] my-2 mx-auto p-4 text-center rounded-md bg-transparent text-black"
-            placeholder="E-mail"
+            placeholder="mail@provider.com"
             name="email"
           ></input>
+          <label className={`mx-auto text-[#2e9c8e] font-bold ${monteSerrat.className}`}>Password</label>
           <input
             type="password"
             className="w-4/5 md:w-2/5 h-[25px] border-[2px] border-[#2e9c8e] my-2 mx-auto p-4 text-center rounded-md bg-transparent text-black"
-            placeholder="Password"
+            placeholder="*****"
             name="password"
           ></input>
           {loading && <BiLoaderAlt className="m-auto animate-spin" />}
