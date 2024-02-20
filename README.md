@@ -1,6 +1,8 @@
 
 # Event Calendar App
 
+## Live page here : https://events-orcin.vercel.app/
+
 Front-end: **NextJS**, **TypeScript**, **TailwindCSS** and **ReactJS**.
 
 Back-end: **NodeJS**, **TypeScript**, **ExpressJS** and **MongoDB**
@@ -18,8 +20,6 @@ To run in dev mode
 ```
 yarn dev
 ```
-
-## Live page here : https://events-orcin.vercel.app/
 
 One .env **API_URL** variable is needed, you can use the live backend server at
  
