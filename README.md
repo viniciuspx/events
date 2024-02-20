@@ -1,7 +1,7 @@
 
 # Event Calendar App
 
-Front-end: **NextJS**, **TypeScript**, **Tailwind** and **ReactJS**.
+Front-end: **NextJS**, **TypeScript**, **TailwindCSS** and **ReactJS**.
 
 Back-end: **NodeJS**, **TypeScript**, **ExpressJS** and **MongoDB**
 
