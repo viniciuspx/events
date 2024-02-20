@@ -1,7 +1,7 @@
 "use client";
 
-import { signup } from "../router/signup";
-import { Button } from "../utils/button";
+import { signup } from "../../router/signup";
+import { Button } from "../../utils/button";
 import { useRouter } from "next/navigation";
 
 export const SignupPage = () => {

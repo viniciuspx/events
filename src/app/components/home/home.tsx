@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Trail } from "../animations/trail";
-import { Button } from "../utils/button";
-import { dancingScript, lemon, monteSerrat } from "@/app/fonts/fonts";
+import { Button } from "../../utils/button";
+import { dancingScript, lemon, monteSerrat } from "@/app/assets/fonts/fonts";
 
 export const MakeHome = () => {
   const [open, setOpen] = useState(false);

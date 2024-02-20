@@ -4,10 +4,10 @@ import Modal from "react-modal";
 
 import { FC, useEffect, useState } from "react";
 
-import { postEvents } from "../router/postEvents";
-import { getEvents } from "../router/getEvents";
-import { deleteAllEntries } from "../router/deleteAllEntries";
-import { deleteByDate } from "../router/deleteByDate";
+import { postEvents } from "../../router/postEvents";
+import { getEvents } from "../../router/getEvents";
+import { deleteAllEntries } from "../../router/deleteAllEntries";
+import { deleteByDate } from "../../router/deleteByDate";
 
 import { BiSolidTrashAlt } from "react-icons/bi";
 import { BiCheckCircle } from "react-icons/bi";
@@ -16,14 +16,14 @@ import { BiEditAlt } from "react-icons/bi";
 import { BiDotsVertical } from "react-icons/bi";
 import { BiMeteor } from "react-icons/bi";
 
-import backimg from "../../img/backdrop.jpg";
+import backimg from "../../assets/img/backdrop.jpg";
 
-import { NewCalendar } from "../utils/calendar";
-import { formatDate } from "../utils/formatedDate";
-import { sortEvents } from "../utils/sort";
-import { eventOverlapping } from "../utils/compareHours";
-import { useFirstRender } from "../utils/useFirstRender";
-import { monteSerrat } from "@/app/fonts/fonts";
+import { NewCalendar } from "../../utils/calendar";
+import { formatDate } from "../../utils/formatedDate";
+import { sortEvents } from "../../utils/sort";
+import { eventOverlapping } from "../../utils/compareHours";
+import { useFirstRender } from "../../utils/useFirstRender";
+import { monteSerrat } from "@/app/assets/fonts/fonts";
 
 interface userboard {
   id: string;

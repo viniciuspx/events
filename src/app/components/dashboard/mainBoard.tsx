@@ -1,8 +1,10 @@
+"use client";
+
 import { FC, useState } from "react";
 import { Board } from "../board/board";
-import { capitalizeFirstLetter } from "../utils/capitalize";
+import { capitalizeFirstLetter } from "../../utils/capitalize";
 import { Logout } from "../logout/logout";
-import { monteSerrat } from "@/app/fonts/fonts";
+import { monteSerrat } from "@/app/assets/fonts/fonts";
 
 interface dashBoardProps {
   user: string;

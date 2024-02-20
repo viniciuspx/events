@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "../utils/button";
-import { dancingScript, lemon } from "@/app/fonts/fonts";
-import { login } from "../router/login";
+import { Button } from "../../utils/button";
+import { dancingScript, lemon } from "@/app/assets/fonts/fonts";
+import { login } from "../../router/login";
 import { useRouter } from "next/navigation";
 import { setLoggedIn } from "../dashboard";
 import { useState } from "react";

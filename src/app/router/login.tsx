@@ -1,5 +1,5 @@
 import axios from "axios";
-import { setUserInfo } from "../dashboard";
+import { setUserInfo } from "../../app/components/dashboard";
 
 export const login = async (event: any) => {
   var res = false;
